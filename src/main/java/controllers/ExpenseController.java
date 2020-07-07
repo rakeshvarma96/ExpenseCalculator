@@ -19,41 +19,39 @@ public class ExpenseController {
     public ExpenseController() {
         expenseService = new ExpenseService();
     }
-    public void addExpense(Map<String, Map<String, Double>> expenseMap, ExpenseMeta expenseMeta) {
+    public String addExpense(Map<String, Map<String, Double>> expenseMap, ExpenseMeta expenseMeta) {
         ExpenseFactory expenseFactory = new ExpenseFactory();
         Expense expense = expenseFactory.getExpenseType(expenseMeta.getType());
-        expense.addExpense(expenseMap, expenseMeta);
+        return expense.addExpense(expenseMap, expenseMeta);
     }
-    public void addUser(Map<String, Map<String, Double>> expenseMap, Map<String, User> userMap, List<String> userInfo) {
-        if (!isValidUser(userInfo)) {
+    public String addUser(Map<String, Map<String, Double>> expenseMap, Map<String, User> userMap, User user) {
+        if (!isValidUser(user)) {
             logger.error("Invalid/Insufficient parameters");
-            return;
+            return "Invalid parameters";
         }
-        if (!isUniqueUser(userMap, userInfo.get(0), userInfo.get(2))) {
+        if (!isUniqueUser(userMap, user)) {
             logger.error("A user with that name/phone already exists.");
-            return;
+            return "A user with that name/phone already exists.";
         }
-        expenseService.addUser(userMap, userInfo);
-        expenseMap.put(userInfo.get(0), new HashMap<>());
+        expenseMap.put(user.getId(), new HashMap<>());
+        return expenseService.addUser(userMap, user);
     }
-    public boolean isValidUser(List<String> userInfo) {
-        if (userInfo.size() != 3)
-            return false;
-        String id = userInfo.get(0);
-        String name = userInfo.get(1);
-        String phone = userInfo.get(2);
+    public boolean isValidUser(User user) {
+        String id = user.getId();
+        String name = user.getName();
+        String phone = user.getPhone();
         return Util.isValidString(id) && Util.isValidString(name) && Util.isValidString(phone) && Util.isValidPhoneNumber(phone);
     }
 
-    public boolean isUniqueUser(Map<String, User> userMap, String id, final String phone) {
-        return !(userMap.containsKey(id) || userMap.values().stream().anyMatch(o -> o.getPhone().equals(phone)));
+    public boolean isUniqueUser(Map<String, User> userMap, User user) {
+        return !(userMap.containsKey(user.getId()) || userMap.values().stream().anyMatch(o -> o.getPhone().equals(user.getPhone())));
     }
 
-    public void showBalanceForUser(Map<String, Map<String, Double>> expenseMap, String userId) {
-        expenseService.showBalanceForUser(expenseMap, userId);
+    public List<String> viewBalForUser(Map<String, Map<String, Double>> expenseMap, String userId) {
+        return expenseService.viewBalForUser(expenseMap, userId);
     }
 
-    public void showAllBalances(Map<String, Map<String, Double>> expenseMap) {
-        expenseService.showAllBalances(expenseMap);
+    public List<String> viewAllBalances(Map<String, Map<String, Double>> expenseMap) {
+        return expenseService.viewAllBalances(expenseMap);
     }
 }

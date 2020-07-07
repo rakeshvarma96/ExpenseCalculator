@@ -1,0 +1,171 @@
+{
+	"info": {
+		"_postman_id": "58e285d1-b475-4a09-ad70-01b9ca186fab",
+		"name": "ExpenseCalculator",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "HealthCheck",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/main/v1/hc",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"main",
+						"v1",
+						"hc"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AddUser",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"shek\",\n    \"name\": \"shekhar\",\n    \"phone\": \"8919047275\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/main/v1/user/add",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"main",
+						"v1",
+						"user",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ShowUsers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/main/v1/user/get",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"main",
+						"v1",
+						"user",
+						"get"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AddExpense",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"milk\",\n    \"notes\": \"nandini\",\n    \"paidBy\": \"shek\",\n    \"participants\": [\n        \"rv\",\n        \"shek\"\n    ],\n    \"amount\": 44,\n    \"type\": \"equal\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/main/v1/expense/add",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"main",
+						"v1",
+						"expense",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ViewAllBalances",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/main/v1/expense/viewAllBalances",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"main",
+						"v1",
+						"expense",
+						"viewAllBalances"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ViewBalanceForUser",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/main/v1/expense/balance?userId=shek",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"main",
+						"v1",
+						"expense",
+						"balance"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "shek"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

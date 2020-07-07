@@ -4,32 +4,38 @@ import models.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class ExpenseService {
     private static final Logger logger = LoggerFactory.getLogger(ExpenseService.class);
 
-    public void addUser(Map<String, User> userMap, List<String> userInfo) {
-        userMap.put(userInfo.get(0), new User(userInfo.get(0), userInfo.get(1), userInfo.get(2)));
+    public String addUser(Map<String, User> userMap, User user) {
+        userMap.put(user.getId(), user);
+        return "success";
     }
 
-    public void showBalanceForUser(Map<String, Map<String, Double>> expenseMap, String userId) {
+    public List<String> viewBalForUser(Map<String, Map<String, Double>> expenseMap, String userId) {
         Map<String, Double> userExpDet = expenseMap.get(userId);
+        List<String> result = new ArrayList<>();
         for (Map.Entry<String, Double> entry : userExpDet.entrySet()) {
             double amount = entry.getValue();
             if (amount > 0)
-                logger.info(userId + " gets " + amount + " from " + entry.getKey());
+                result.add(userId + " gets " + amount + " from " + entry.getKey());
             else if (amount < 0)
-                logger.info(userId + " owes " + entry.getKey() + " " + -1 * amount);
+                result.add(userId + " owes " + entry.getKey() + " " + -1 * amount);
             else
-                logger.info("You are settled");
+                result.add("You are settled");
         }
+        return result;
     }
 
-    public void showAllBalances(Map<String, Map<String, Double>> expenseMap) {
+    public List<String> viewAllBalances(Map<String, Map<String, Double>> expenseMap) {
+        List<String> res = new ArrayList<>();
         for (Map.Entry<String, Map<String, Double>> entry : expenseMap.entrySet()) {
-            showBalanceForUser(expenseMap, entry.getKey());
+            res.addAll(viewBalForUser(expenseMap, entry.getKey()));
         }
+        return res;
     }
 }
