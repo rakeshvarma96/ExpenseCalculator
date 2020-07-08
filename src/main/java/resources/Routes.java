@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import entry.ExpenseMain;
+import controllers.ExpenseController;
 import lib.Util;
 import models.ExpenseMeta;
 import models.User;
@@ -16,7 +16,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @Path("/v1")
@@ -40,8 +39,8 @@ public class Routes {
         String id = jsonNode.get("id").textValue();
         String name = jsonNode.get("name").textValue();
         String phone = jsonNode.get("phone").textValue();
-        ExpenseMain expenseMain = ExpenseMain.getInstance();
-        String res = expenseMain.addUser(new User(id, name, phone));
+        ExpenseController controller = ExpenseController.getInstance();
+        String res = controller.addUser(controller.getExpenseMap(), controller.getUserMap(), new User(id, name, phone));
         if(res.equals("success"))
             return Response.status(200).entity("success").build();
         return Response.status(400).entity(res).build();
@@ -51,9 +50,8 @@ public class Routes {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<User> showUsers() {
-        ExpenseMain expenseMain = ExpenseMain.getInstance();
-        List<User> res = expenseMain.showUsers();
-        return res;
+        ExpenseController controller = ExpenseController.getInstance();
+        return controller.showUsers();
     }
 
     @Path("/expense/add")
@@ -78,9 +76,9 @@ public class Routes {
             contributions = mapper.readValue(arrayNode.traverse(), new TypeReference<List<Double>>() {});
         double amount = jsonNode.get("amount").asDouble();
         String type = jsonNode.get("type").textValue();
-        ExpenseMain expenseMain = ExpenseMain.getInstance();
+        ExpenseController controller = ExpenseController.getInstance();
         ExpenseMeta expenseMeta = new ExpenseMeta(name, description, paidBy, participants, contributions, amount, type);
-        String res = expenseMain.addExpense(expenseMeta);
+        String res = controller.addExpense(controller.getExpenseMap(), expenseMeta);
         if(res.equals("success"))
             return Response.status(200).entity("success").build();
         return Response.status(400).entity(res).build();
@@ -90,15 +88,15 @@ public class Routes {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<String> viewBalForUser(@QueryParam("userId") String userId) {
-        ExpenseMain expenseMain = ExpenseMain.getInstance();
-        return expenseMain.viewBalForUser(userId);
+        ExpenseController controller = ExpenseController.getInstance();
+        return controller.viewBalForUser(controller.getExpenseMap(), userId);
     }
 
     @Path("expense/viewAllBalances")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<String> viewAllBalances() {
-        ExpenseMain expenseMain = ExpenseMain.getInstance();
-        return expenseMain.viewAllBalances();
+        ExpenseController controller = ExpenseController.getInstance();
+        return controller.viewAllBalances(controller.getExpenseMap());
     }
 }
