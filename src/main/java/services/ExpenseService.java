@@ -5,15 +5,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 public class ExpenseService {
     private static final Logger logger = LoggerFactory.getLogger(ExpenseService.class);
 
-    public String addUser(Map<String, User> userMap, User user) {
+    public boolean addUser(Map<String, User> userMap, User user) {
         userMap.put(user.getId(), user);
-        return "success";
+        return true;
     }
 
     public List<String> viewBalForUser(Map<String, Map<String, Double>> expenseMap, String userId) {

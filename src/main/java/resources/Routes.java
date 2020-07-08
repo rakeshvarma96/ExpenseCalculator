@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import controllers.ExpenseController;
 import lib.Util;
+import models.APIResponse;
 import models.ExpenseMeta;
 import models.User;
 import validators.APIRequestValidator;
@@ -33,25 +34,23 @@ public class Routes {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createUser(String json) throws IOException, ProcessingException {
         if(!APIRequestValidator.isValidCreateUser(json)) {
-            return Response.status(400).entity("Insufficient input params").build();
+            return Util.formatResponse(new APIResponse(400, "Insufficient input params", "failed", null));
         }
         JsonNode jsonNode = Util.parseJSON(json);
         String id = jsonNode.get("id").textValue();
         String name = jsonNode.get("name").textValue();
         String phone = jsonNode.get("phone").textValue();
         ExpenseController controller = ExpenseController.getInstance();
-        String res = controller.addUser(controller.getExpenseMap(), controller.getUserMap(), new User(id, name, phone));
-        if(res.equals("success"))
-            return Response.status(200).entity("success").build();
-        return Response.status(400).entity(res).build();
+        APIResponse response = controller.addUser(controller.getExpenseMap(), controller.getUserMap(), new User(id, name, phone));
+        return Util.formatResponse(response);
     }
 
     @Path("/user/get")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<User> showUsers() {
+    public Response showUsers() {
         ExpenseController controller = ExpenseController.getInstance();
-        return controller.showUsers();
+        return Util.formatResponse(controller.showUsers());
     }
 
     @Path("/expense/add")
@@ -60,7 +59,7 @@ public class Routes {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addExpense(String json) throws IOException, ProcessingException {
         if(!APIRequestValidator.isValidExpense(json)) {
-            return Response.status(400).entity("Insufficient input params").build();
+            return Util.formatResponse(new APIResponse(400, "Insufficient input params", "failed", null));
         }
         ObjectMapper mapper = new ObjectMapper();
         JsonNode arrayNode;
@@ -78,25 +77,23 @@ public class Routes {
         String type = jsonNode.get("type").textValue();
         ExpenseController controller = ExpenseController.getInstance();
         ExpenseMeta expenseMeta = new ExpenseMeta(name, description, paidBy, participants, contributions, amount, type);
-        String res = controller.addExpense(controller.getExpenseMap(), expenseMeta);
-        if(res.equals("success"))
-            return Response.status(200).entity("success").build();
-        return Response.status(400).entity(res).build();
+        APIResponse response = controller.addExpense(controller.getExpenseMap(), expenseMeta);
+        return Util.formatResponse(response);
     }
 
     @Path("expense/balance/")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<String> viewBalForUser(@QueryParam("userId") String userId) {
+    public Response viewBalForUser(@QueryParam("userId") String userId) {
         ExpenseController controller = ExpenseController.getInstance();
-        return controller.viewBalForUser(controller.getExpenseMap(), userId);
+        return Util.formatResponse(controller.viewBalForUser(controller.getExpenseMap(), userId));
     }
 
     @Path("expense/viewAllBalances")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<String> viewAllBalances() {
+    public Response viewAllBalances() {
         ExpenseController controller = ExpenseController.getInstance();
-        return controller.viewAllBalances(controller.getExpenseMap());
+        return Util.formatResponse(controller.viewAllBalances(controller.getExpenseMap()));
     }
 }

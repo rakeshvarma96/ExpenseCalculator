@@ -21,7 +21,7 @@ public class EqualSplitService extends Expense {
     }
 
     @Override
-    public String addExpense(Map expenseMap, ExpenseMeta expenseMeta) {
+    public boolean addExpense(Map expenseMap, ExpenseMeta expenseMeta) {
         return super.addExpense(expenseMap, expenseMeta);
     }
 

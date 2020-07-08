@@ -3,6 +3,7 @@ package controllers;
 import factory.ExpenseFactory;
 import interfaces.Expense;
 import lib.Util;
+import models.APIResponse;
 import models.ExpenseMeta;
 import models.User;
 import org.slf4j.Logger;
@@ -47,38 +48,44 @@ public class ExpenseController {
         return expenseMap;
     }
 
-    public String addUser(Map<String, Map<String, Double>> expenseMap, Map<String, User> userMap, User user) {
+    public APIResponse addUser(Map<String, Map<String, Double>> expenseMap, Map<String, User> userMap, User user) {
         if (!isValidUser(user)) {
             logger.error("Invalid/Insufficient parameters");
-            return "Invalid parameters";
+            return new APIResponse(400, "Invalid parameters", "failed", null);
         }
         if (!isUniqueUser(userMap, user)) {
             logger.error("A user with that name/phone already exists.");
-            return "A user with that name/phone already exists.";
+            return new APIResponse(400, "A user with that name/phone already exists", "failed", null);
         }
         expenseMap.put(user.getId(), new HashMap<>());
-        return expenseService.addUser(userMap, user);
+        if(expenseService.addUser(userMap, user))
+            return new APIResponse(200, "successfully added user", "success", null);
+        return new APIResponse(500, "internal server error", "failed", null);
     }
 
-    public List<User> showUsers() {
+    public APIResponse showUsers() {
         for (Map.Entry<String, User> entry : userMap.entrySet()) {
             logger.info("User id:" + entry.getKey() + ", User name:" + entry.getValue().getName());
         }
-        return new ArrayList<>(userMap.values());
+        return new APIResponse(200, "fetched users successfully", "success", new ArrayList<>(userMap.values()));
     }
 
-    public String addExpense(Map<String, Map<String, Double>> expenseMap, ExpenseMeta expenseMeta) {
+    public APIResponse addExpense(Map<String, Map<String, Double>> expenseMap, ExpenseMeta expenseMeta) {
         ExpenseFactory expenseFactory = new ExpenseFactory();
         Expense expense = expenseFactory.getExpenseType(expenseMeta.getType());
-        return expense.addExpense(expenseMap, expenseMeta);
+        if(expense.addExpense(expenseMap, expenseMeta))
+            return new APIResponse(200, "expense added successfully", "success", null);
+        return new APIResponse(422, "Cannot process", "failed", null) ;
     }
 
-    public List<String> viewBalForUser(Map<String, Map<String, Double>> expenseMap, String userId) {
-        return expenseService.viewBalForUser(expenseMap, userId);
+    public APIResponse viewBalForUser(Map<String, Map<String, Double>> expenseMap, String userId) {
+        List<String> result = expenseService.viewBalForUser(expenseMap, userId);
+        return new APIResponse(200, "view balances for user is successful", "success", result);
     }
 
-    public List<String> viewAllBalances(Map<String, Map<String, Double>> expenseMap) {
-        return expenseService.viewAllBalances(expenseMap);
+    public APIResponse viewAllBalances(Map<String, Map<String, Double>> expenseMap) {
+        List<String> result = expenseService.viewAllBalances(expenseMap);
+        return new APIResponse(200, "view balances for users is successful", "success", result);
     }
 
     public boolean isValidUser(User user) {

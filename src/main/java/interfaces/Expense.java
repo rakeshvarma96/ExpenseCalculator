@@ -13,10 +13,10 @@ public abstract class Expense {
         return null;
     }
 
-    public String addExpense(Map expenseMap, ExpenseMeta expenseMeta) {
+    public boolean addExpense(Map expenseMap, ExpenseMeta expenseMeta) {
         if(!isValidExpense(expenseMeta)) {
             logger.error("Numbers don't add up");
-            return "Numbers don't add up";
+            return false ;
         }
         Map<String, Double> balances;
         List<String> participants = expenseMeta.getParticipants();
@@ -34,7 +34,7 @@ public abstract class Expense {
             balances.putIfAbsent(paidBy, 0.0);
             balances.put(paidBy, balances.get(paidBy)-share);
         }
-        return "success";
+        return true;
     }
 
     public boolean isValidExpense(ExpenseMeta expenseMeta) {
