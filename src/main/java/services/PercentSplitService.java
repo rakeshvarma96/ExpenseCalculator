@@ -22,7 +22,7 @@ public class PercentSplitService extends Expense {
     }
 
     @Override
-    public boolean addExpense(Map expenseMap, ExpenseMeta expenseMeta) {
+    public boolean addExpense(Map<String, Map<String, Double>> expenseMap, ExpenseMeta expenseMeta) {
         return super.addExpense(expenseMap, expenseMeta);
     }
 

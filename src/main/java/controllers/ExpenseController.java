@@ -10,21 +10,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import services.ExpenseService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ExpenseController {
     private static final Logger logger = LoggerFactory.getLogger(ExpenseController.class);
     private ExpenseService expenseService;
     private Map<String, User> userMap;
     private Map<String, Map<String, Double>> expenseMap;
+    private Map<String, List<String>> groupMap;
     private static ExpenseController expenseController;
     private ExpenseController() {
 
     }
-    private ExpenseController(Map<String, User> userMap, Map<String, Map<String, Double>> expenseMap) {
+    private ExpenseController(Map<String, User> userMap, Map<String, Map<String, Double>> expenseMap, Map<String, List<String>> groupMap) {
+        this.groupMap = groupMap;
         this.expenseService = new ExpenseService();
         this.userMap = userMap;
         this.expenseMap = expenseMap;
@@ -33,22 +32,14 @@ public class ExpenseController {
         if(expenseController == null) {
             synchronized (ExpenseController.class) {
                 if(expenseController == null) {
-                    expenseController = new ExpenseController(new HashMap<>(), new HashMap<>());
+                    expenseController = new ExpenseController(new HashMap<>(), new HashMap<>(), new HashMap<>());
                 }
             }
         }
         return expenseController;
     }
 
-    public Map<String, User> getUserMap() {
-        return userMap;
-    }
-
-    public Map<String, Map<String, Double>> getExpenseMap() {
-        return expenseMap;
-    }
-
-    public APIResponse addUser(Map<String, Map<String, Double>> expenseMap, Map<String, User> userMap, User user) {
+    public APIResponse addUser(User user) {
         if (!isValidUser(user)) {
             logger.error("Invalid/Insufficient parameters");
             return new APIResponse(400, "Invalid parameters", "failed", null);
@@ -70,7 +61,7 @@ public class ExpenseController {
         return new APIResponse(200, "fetched users successfully", "success", new ArrayList<>(userMap.values()));
     }
 
-    public APIResponse addExpense(Map<String, Map<String, Double>> expenseMap, ExpenseMeta expenseMeta) {
+    public APIResponse addExpense(ExpenseMeta expenseMeta) {
         ExpenseFactory expenseFactory = new ExpenseFactory();
         Expense expense = expenseFactory.getExpenseType(expenseMeta.getType());
         if(expense.addExpense(expenseMap, expenseMeta))
@@ -78,14 +69,30 @@ public class ExpenseController {
         return new APIResponse(422, "Cannot process", "failed", null) ;
     }
 
-    public APIResponse viewBalForUser(Map<String, Map<String, Double>> expenseMap, String userId) {
+    public APIResponse viewBalForUser(String userId) {
         List<String> result = expenseService.viewBalForUser(expenseMap, userId);
         return new APIResponse(200, "view balances for user is successful", "success", result);
     }
 
-    public APIResponse viewAllBalances(Map<String, Map<String, Double>> expenseMap) {
+    public APIResponse viewAllBalances() {
         List<String> result = expenseService.viewAllBalances(expenseMap);
         return new APIResponse(200, "view balances for users is successful", "success", result);
+    }
+
+    public APIResponse addGroup(String name, List<String> users) {
+        if(isGroupExists(name) || !areUsersExist(users))
+            return new APIResponse(400, "group with name already exists/users doesn't exist", "failed", null);
+        if(expenseService.addGroup(groupMap, name, users))
+            return new APIResponse(200, "group has successfully been created", "success", null);
+        return new APIResponse(422, "Cannot process", "failed", null) ;
+    }
+
+    public APIResponse addUsersToGroup(String name, List<String> users) {
+        if(!isGroupExists(name) || !areUsersExist(users) || (isGroupExists(name) && areUsersInGroup(groupMap, name, users)))
+            return new APIResponse(400, "group/users doesn't exist or the group already having user(s) specified", "failed", null);
+        if(expenseService.addUsersToGroup(groupMap, name, users))
+            return new APIResponse(200, "users have successfully been added to the group", "success", null);
+        return new APIResponse(422, "Cannot process", "failed", null) ;
     }
 
     public boolean isValidUser(User user) {
@@ -99,4 +106,15 @@ public class ExpenseController {
         return !(userMap.containsKey(user.getId()) || userMap.values().stream().anyMatch(o -> o.getPhone().equals(user.getPhone())));
     }
 
+    public boolean isGroupExists(String name) {
+        return groupMap.containsKey(name);
+    }
+
+    public boolean areUsersExist(List<String> users) {
+        return userMap.keySet().containsAll(users);
+    }
+
+    public boolean areUsersInGroup(Map<String, List<String>> groupMap, String name, List<String> users) {
+        return !groupMap.get(name).isEmpty() && !users.isEmpty() && !Collections.disjoint(groupMap.get(name), users);
+    }
 }

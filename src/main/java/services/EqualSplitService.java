@@ -15,13 +15,13 @@ public class EqualSplitService extends Expense {
         List<String> participants = expenseMeta.getParticipants();
         double share = amount / participants.size();
         List<Double> splits = new ArrayList<>();
-        for (String each : participants)
+        for (String ignored : participants)
             splits.add(share);
         return splits;
     }
 
     @Override
-    public boolean addExpense(Map expenseMap, ExpenseMeta expenseMeta) {
+    public boolean addExpense(Map<String, Map<String, Double>> expenseMap, ExpenseMeta expenseMeta) {
         return super.addExpense(expenseMap, expenseMeta);
     }
 

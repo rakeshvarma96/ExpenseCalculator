@@ -4,8 +4,8 @@ import models.ExpenseMeta;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 public abstract class Expense {
     private static final Logger logger = LoggerFactory.getLogger(Expense.class);
@@ -13,7 +13,7 @@ public abstract class Expense {
         return null;
     }
 
-    public boolean addExpense(Map expenseMap, ExpenseMeta expenseMeta) {
+    public boolean addExpense(Map<String, Map<String, Double>> expenseMap, ExpenseMeta expenseMeta) {
         if(!isValidExpense(expenseMeta)) {
             logger.error("Numbers don't add up");
             return false ;
@@ -27,10 +27,10 @@ public abstract class Expense {
             if(paidBy.equals(paidTo))
                 continue;
             double share = splits.get(i);
-            balances = (Map<String, Double>) expenseMap.get(paidBy);
+            balances = expenseMap.get(paidBy);
             balances.putIfAbsent(paidTo, 0.0);
             balances.put(paidTo, balances.get(paidTo)+share);
-            balances = (Map<String, Double>)expenseMap.get(paidTo);
+            balances = expenseMap.get(paidTo);
             balances.putIfAbsent(paidBy, 0.0);
             balances.put(paidBy, balances.get(paidBy)-share);
         }

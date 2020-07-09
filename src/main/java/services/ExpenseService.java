@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -38,5 +37,17 @@ public class ExpenseService {
             res.addAll(viewBalForUser(expenseMap, entry.getKey()));
         }
         return res;
+    }
+
+    public boolean addGroup(Map<String, List<String>> groupMap, String name, List<String> users) {
+        groupMap.put(name, users);
+        return true;
+    }
+
+    public boolean addUsersToGroup(Map<String, List<String>> groupMap, String name, List<String> users) {
+        List<String> existingUsers = groupMap.get(name);
+        existingUsers.addAll(users);
+        groupMap.put(name, existingUsers);
+        return true;
     }
 }
