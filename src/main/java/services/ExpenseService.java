@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,9 +25,9 @@ public class ExpenseService {
             if (amount > 0)
                 result.add(userId + " gets " + amount + " from " + entry.getKey());
             else if (amount < 0)
-                result.add(userId + " owes " + entry.getKey() + " " + -1 * amount);
+                result.add(userId + " owes " + entry.getKey() + " " + Math.abs(amount));
             else
-                result.add("You are settled");
+                result.add(userId + " is settled");
         }
         return result;
     }
@@ -50,4 +51,28 @@ public class ExpenseService {
         groupMap.put(name, existingUsers);
         return true;
     }
+
+    public Map<String, List<String>> viewGroupBalances(Map<String, List<String>> groupMap, String groupName, Map<String, Map<String, Double>> expenseMap) {
+        Map<String, List<String>> groupBalances = new HashMap<>();
+        List<String> balances = new ArrayList<>();
+        for(String participant: groupMap.get(groupName)) {
+            balances.addAll(viewBalForUser(expenseMap, participant));
+        }
+        groupBalances.put(groupName, balances);
+        return groupBalances;
+    }
+
+    public Map<String, List<String>> viewAllGroupBalances(Map<String, List<String>> groupMap, Map<String, Map<String, Double>> expenseMap) {
+        Map<String, List<String>> allGroupBalances = new HashMap<>();
+        for(Map.Entry<String, List<String>> entry: groupMap.entrySet()) {
+            String groupName = entry.getKey();
+            List<String> expenses = new ArrayList<>();
+            for(String participant: entry.getValue()) {
+                expenses.addAll(viewBalForUser(expenseMap, participant));
+            }
+            allGroupBalances.put(groupName, expenses);
+        }
+        return allGroupBalances;
+    }
+
 }

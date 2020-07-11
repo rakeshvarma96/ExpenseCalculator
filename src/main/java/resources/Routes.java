@@ -33,7 +33,8 @@ public class Routes {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createUser(String json) throws IOException, ProcessingException {
-        if(!APIRequestValidator.isValidCreateUser(json)) {
+        String createUserJson = "/Users/rakesh/Downloads/Projects/src/main/java/jsonSchemas/User.json";
+        if(!APIRequestValidator.isValidRequest(json, createUserJson)) {
             return Util.formatResponse(new APIResponse(400, "Insufficient input params", "failed", null));
         }
         JsonNode jsonNode = Util.parseJSON(json);
@@ -58,7 +59,8 @@ public class Routes {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addExpense(String json) throws IOException, ProcessingException {
-        if(!APIRequestValidator.isValidExpense(json)) {
+        String addExpenseJson = "/Users/rakesh/Downloads/Projects/src/main/java/jsonSchemas/Expense.json";
+        if(!APIRequestValidator.isValidRequest(json, addExpenseJson)) {
             return Util.formatResponse(new APIResponse(400, "Insufficient input params", "failed", null));
         }
         ObjectMapper mapper = new ObjectMapper();
@@ -102,7 +104,8 @@ public class Routes {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addGroup(String json) throws IOException, ProcessingException {
-        if(!APIRequestValidator.isValidCreateGroup(json)) {
+        String addGroupJson = "/Users/rakesh/Downloads/Projects/src/main/java/jsonSchemas/Group.json";
+        if(!APIRequestValidator.isValidRequest(json, addGroupJson)) {
             return Util.formatResponse(new APIResponse(400, "Insufficient input params", "failed", null));
         }
         JsonNode jsonNode = Util.parseJSON(json);
@@ -121,7 +124,8 @@ public class Routes {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addUserToGroup(String json) throws IOException, ProcessingException {
-        if(!APIRequestValidator.isValidCreateGroup(json)) {
+        String addUserToGroupJson = "/Users/rakesh/Downloads/Projects/src/main/java/jsonSchemas/Group.json";
+        if(!APIRequestValidator.isValidRequest(json, addUserToGroupJson)) {
             return Util.formatResponse(new APIResponse(400, "Insufficient input params", "failed", null));
         }
         JsonNode jsonNode = Util.parseJSON(json);
@@ -133,5 +137,64 @@ public class Routes {
         ExpenseController expenseController = ExpenseController.getInstance();
         APIResponse response = expenseController.addUsersToGroup(name, users);
         return Util.formatResponse(response);
+    }
+
+    @Path("group/viewAll/")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response viewAllGroups() {
+        ExpenseController expenseController = ExpenseController.getInstance();
+        APIResponse response = expenseController.viewAllGroups();
+        return Util.formatResponse(response);
+    }
+
+    @Path("group/addExpense/")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response addGroupExpense(String json) throws IOException, ProcessingException {
+        String addGroupExpenseJson = "/Users/rakesh/Downloads/Projects/src/main/java/jsonSchemas/GroupExpense.json";
+        if(!APIRequestValidator.isValidRequest(json, addGroupExpenseJson)) {
+            return Util.formatResponse(new APIResponse(400, "Insufficient input params", "failed", null));
+        }
+        JsonNode arrayNode;
+        List<Double> splits = null;
+        List<String> participants = null;
+        JsonNode jsonNode = Util.parseJSON(json);
+        ObjectMapper mapper = new ObjectMapper();
+        String group = jsonNode.get("group").textValue();
+        String expense = jsonNode.get("expense").textValue();
+        String description = jsonNode.get("notes").textValue();
+        String paidBy = jsonNode.get("paidBy").textValue();
+        double amount = jsonNode.get("amount").asDouble();
+        String type = jsonNode.get("type").textValue();
+        arrayNode = jsonNode.get("participants");
+        if(arrayNode != null && !arrayNode.isNull())
+            participants = mapper.readValue(arrayNode.traverse(), new TypeReference<List<String>>() {});
+        arrayNode = jsonNode.get("splits");
+        if(arrayNode != null && !arrayNode.isNull())
+            splits = mapper.readValue(arrayNode.traverse(), new TypeReference<List<Double>>() {});
+
+        ExpenseController controller = ExpenseController.getInstance();
+        ExpenseMeta expenseMeta = new ExpenseMeta(expense, description, paidBy, participants, splits, amount, type);
+        expenseMeta.setGroupName(group);
+        APIResponse response = controller.addGroupExpense(expenseMeta);
+        return Util.formatResponse(response);
+    }
+
+    @Path("group/viewGroupBalances")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response viewGroupBalances(@QueryParam("groupName") String groupName) {
+        ExpenseController controller = ExpenseController.getInstance();
+        return Util.formatResponse(controller.viewGroupBalances(groupName));
+    }
+
+    @Path("group/viewAllGroupBalances/")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response viewAllGroupBalances() {
+        ExpenseController controller = ExpenseController.getInstance();
+        return Util.formatResponse(controller.viewAllGroupBalances());
     }
 }

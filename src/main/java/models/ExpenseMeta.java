@@ -10,6 +10,7 @@ public class ExpenseMeta {
     private List<Double> contributions;
     private double amount;
     private String type;
+    private String groupName;
 
     public ExpenseMeta() {
     }
@@ -22,6 +23,14 @@ public class ExpenseMeta {
         this.contributions = contributions;
         this.amount = amount;
         this.type = type;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
     public String getExpenseName() {

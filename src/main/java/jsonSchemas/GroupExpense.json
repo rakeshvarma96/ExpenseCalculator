@@ -1,0 +1,157 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "title": "The root schema",
+  "description": "The root schema comprises the entire JSON document.",
+  "default": {},
+  "examples": [
+    {
+      "group": "friends",
+      "participants": [
+        "rakesh",
+        "sai"
+      ],
+      "expense": "Chicken",
+      "notes": "Meghana",
+      "paidBy": "rakesh",
+      "amount": 460,
+      "type": "equal",
+      "splits": [
+        20,
+        80
+      ]
+    }
+  ],
+  "required": [
+    "group",
+    "expense",
+    "notes",
+    "paidBy",
+    "amount",
+    "type"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "group": {
+      "$id": "#/properties/group",
+      "type": "string",
+      "title": "The group schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": "",
+      "examples": [
+        "friends"
+      ]
+    },
+    "participants": {
+      "$id": "#/properties/participants",
+      "type": "array",
+      "title": "The participants schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": [],
+      "examples": [
+        [
+          "rakesh",
+          "sai"
+        ]
+      ],
+      "additionalItems": true,
+      "items": {
+        "anyOf": [
+          {
+            "$id": "#/properties/participants/items/anyOf/0",
+            "type": "string",
+            "title": "The first anyOf schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+              "rakesh",
+              "sai"
+            ]
+          }
+        ],
+        "$id": "#/properties/participants/items"
+      }
+    },
+    "expense": {
+      "$id": "#/properties/expense",
+      "type": "string",
+      "title": "The expense schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": "",
+      "examples": [
+        "Chicken"
+      ]
+    },
+    "notes": {
+      "$id": "#/properties/notes",
+      "type": "string",
+      "title": "The notes schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": "",
+      "examples": [
+        "Meghana"
+      ]
+    },
+    "paidBy": {
+      "$id": "#/properties/paidBy",
+      "type": "string",
+      "title": "The paidBy schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": "",
+      "examples": [
+        "rakesh"
+      ]
+    },
+    "amount": {
+      "$id": "#/properties/amount",
+      "type": "integer",
+      "title": "The amount schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": 0,
+      "examples": [
+        460
+      ]
+    },
+    "type": {
+      "$id": "#/properties/type",
+      "type": "string",
+      "title": "The type schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": "",
+      "examples": [
+        "equal"
+      ]
+    },
+    "splits": {
+      "$id": "#/properties/splits",
+      "type": "array",
+      "title": "The splits schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": [],
+      "examples": [
+        [
+          20,
+          80
+        ]
+      ],
+      "additionalItems": true,
+      "items": {
+        "anyOf": [
+          {
+            "$id": "#/properties/splits/items/anyOf/0",
+            "type": "integer",
+            "title": "The first anyOf schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+              20,
+              80
+            ]
+          }
+        ],
+        "$id": "#/properties/splits/items"
+      }
+    }
+  }
+}

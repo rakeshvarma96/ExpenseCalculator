@@ -64,12 +64,16 @@ public class ExpenseController {
     public APIResponse addExpense(ExpenseMeta expenseMeta) {
         ExpenseFactory expenseFactory = new ExpenseFactory();
         Expense expense = expenseFactory.getExpenseType(expenseMeta.getType());
+        if(expense == null)
+            return new APIResponse(400, "Specify a valid type", "failed", null);
         if(expense.addExpense(expenseMap, expenseMeta))
             return new APIResponse(200, "expense added successfully", "success", null);
         return new APIResponse(422, "Cannot process", "failed", null) ;
     }
 
     public APIResponse viewBalForUser(String userId) {
+        if(!userMap.containsKey(userId))
+            return new APIResponse(400, "specified user doesn't exist", "failed", null);
         List<String> result = expenseService.viewBalForUser(expenseMap, userId);
         return new APIResponse(200, "view balances for user is successful", "success", result);
     }
@@ -93,6 +97,31 @@ public class ExpenseController {
         if(expenseService.addUsersToGroup(groupMap, name, users))
             return new APIResponse(200, "users have successfully been added to the group", "success", null);
         return new APIResponse(422, "Cannot process", "failed", null) ;
+    }
+
+    public APIResponse viewAllGroups() {
+        return new APIResponse(200, "view all groups is success", "success", groupMap);
+    }
+
+    public APIResponse addGroupExpense(ExpenseMeta expenseMeta) {
+        String groupName = expenseMeta.getGroupName();
+        List<String> participants = expenseMeta.getParticipants() != null?expenseMeta.getParticipants():groupMap.get(groupName);
+        expenseMeta.setParticipants(participants);
+        if(!isGroupExists(groupName) || !areUsersExist(participants) || !areUsersInGroup(groupMap, groupName, participants))
+            return new APIResponse(400, "group/users doesn't exist or the group doesn't have user(s) specified", "failed", null);
+        return addExpense(expenseMeta);
+    }
+
+    public APIResponse viewGroupBalances(String groupName) {
+        if(!groupMap.containsKey(groupName))
+            return new APIResponse(400, "specified group doesn't exist", "failed", null);
+        Map<String, List<String>> result = expenseService.viewGroupBalances(groupMap, groupName, expenseMap);
+        return new APIResponse(200, "view group expenses is success", "success", result);
+    }
+
+    public APIResponse viewAllGroupBalances() {
+        Map<String, List<String>> result = expenseService.viewAllGroupBalances(groupMap, expenseMap);
+        return new APIResponse(200, "view all groups expenses is success", "success", result);
     }
 
     public boolean isValidUser(User user) {

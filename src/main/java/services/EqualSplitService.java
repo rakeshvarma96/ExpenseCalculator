@@ -5,7 +5,6 @@ import models.ExpenseMeta;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class EqualSplitService extends Expense {
 
@@ -19,15 +18,4 @@ public class EqualSplitService extends Expense {
             splits.add(share);
         return splits;
     }
-
-    @Override
-    public boolean addExpense(Map<String, Map<String, Double>> expenseMap, ExpenseMeta expenseMeta) {
-        return super.addExpense(expenseMap, expenseMeta);
-    }
-
-    @Override
-    public boolean isValidExpense(ExpenseMeta expenseMeta) {
-        return super.isValidExpense(expenseMeta);
-    }
-
 }
